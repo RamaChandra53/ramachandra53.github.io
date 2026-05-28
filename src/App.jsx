@@ -6,7 +6,7 @@ import { Moon, Sun, MapPin } from "lucide-react";
    ============================================================ */
 const PROFILE = {
   name: "Rama Chandra",                          // ← your name
-  title: "Just a techie",     // ← your tagline
+  title: "",     // ← your tagline
   avatar: "/avatar.jpg",                 // ← put your photo in /public/avatar.jpg
   email: "vramachandra@proton.me",             // ← your email
   location: "Hyderabad, India",          // ← your city
@@ -16,33 +16,31 @@ const PROFILE = {
   // Each string = one paragraph. Add or remove as needed.
   bio: [
     <>
-      Hi, I'm 19 yr old , rabbit hole explorer, deep diver asdfa sadf asdfcurious mind
-      deeply interested in offensive security and digital investigations.      
+      Hi, I'm a 19 yr old techbreaker, engineer, anime/movie lover, curious, 
+      deeply interested in defensive security and digital investigations.      
     </>,
     <>
-      Outside of academics, I'm writing code, exploring security
-      challenges, reading, listening to music, or chasing down obscure
-      technical rabbit holes. Most of my projects are available on{" "}
-      <BoldLink href="https://github.com/RamaChandra53/">GitHub</BoldLink>.
-      Currently balancing my studies, new technologies, reading books, learning to code
-      
+      When you're reading this, I might be doing one of these : hacking my college website, learning to code,
+      reading books, exploring new technologies or just sleeping.
+            
     </>,
     <>
-      I'm open to new roles, collaborations, and opportunities. Feel free
-      to reach out at{" "}
+      My projects are available on{" "}
+      <BoldLink href="https://github.com/RamaChandra53/">GitHub</BoldLink>
+    
+    </>,
+    <>
+      Feel free to reach me at{" "}
       {/* ← change the email below */}
       <BoldLink href="mailto:vramachandra@proton.me">vramachandra@proton.me</BoldLink>.
     </>,
-    <>
-      If you're here, chances are I'd enjoy talking to you — send me
-      something fascinating, weird, or technically delightful.
-    </>,
+   
   ],
 
   // ── Nav links at the bottom ──────────────────────────────────
   // Add, remove, or rename any of these
   links: [
-    { label: "blog",    href: "#" },
+    { label: "blog",    href: "/blog" },
     { label: "github",  href: "https://github.com/RamaChandra53" },
     { label: "twitter", href: "https://x.com/not_ramachandra" },
     { label: "email",   href: "mailto:vramachandra@proton.me" },
@@ -110,7 +108,7 @@ export default function PersonalWebsite() {
   }, []);
 
   // ── Color themes ─────────────────────────────────────────────
-  const bg        = dark ? "#070c14"                 : "#f0ede8";
+  const bg = dark ? "#000000" : "#ffffff";
   const textMain  = dark ? "rgba(241,237,230,0.92)"  : "#1c1a17";
   const textMuted = dark ? "rgba(180,175,165,0.65)"  : "#6b6560";
   const blobLeft  = dark ? "rgba(59,130,246,0.28)"   : "rgba(59,130,246,0.12)";
@@ -118,8 +116,9 @@ export default function PersonalWebsite() {
 
   return (
     <div style={{
-      minHeight: "100vh",
-      background: bg,
+      minHeight: "100dvh",
+      width: "100vw",
+      background: bg, 
       color: textMain,
       fontFamily: "'Inter', sans-serif",
       fontSize: 16,
@@ -129,45 +128,43 @@ export default function PersonalWebsite() {
       overflowX: "hidden",
     }}>
 
-      {/* ── Background blobs ─────────────────────────────────────
-          These create the blue/indigo glow effect from the screenshot */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <div style={{
-          position: "absolute", top: -80, left: -120,
-          width: 500, height: 500, borderRadius: "50%",
-          background: blobLeft, filter: "blur(110px)",
-          transition: "background 0.4s",
-        }} />
-        <div style={{
-          position: "absolute", bottom: -100, right: -60,
-          width: 560, height: 560, borderRadius: "50%",
-          background: blobRight, filter: "blur(120px)",
-          transition: "background 0.4s",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: dark
-            ? "radial-gradient(circle at center, transparent 30%, rgba(7,12,20,0.6) 100%)"
-            : "radial-gradient(circle at center, transparent 30%, rgba(240,237,232,0.5) 100%)",
-        }} />
-      </div>
-
+    
       {/* ── Theme toggle (top-right) ─────────────────────────────── */}
-      <button
-        aria-label="Toggle theme"
-        onClick={() => setDark(d => !d)}
-        style={{
-          position: "fixed", top: 24, right: 28, zIndex: 20,
-          width: 38, height: 38, borderRadius: "50%",
-          background: "transparent",
-          border: `1px solid ${dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`,
-          color: textMuted,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          cursor: "pointer", transition: "all 0.2s",
-        }}
-      >
-        {dark ? <Moon size={15} /> : <Sun size={15} />}
-      </button>
+              <button
+          aria-label="Toggle theme"
+          onClick={() => setDark(d => !d)}
+          style={{
+            position: "fixed",
+            top: 24,
+            right: 28,
+            zIndex: 20,
+            width: 64,
+            height: 32,
+            borderRadius: 999,
+            border: `1px solid ${dark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.18)"}`,
+            background: dark ? "#111" : "#eee",
+            cursor: "pointer",
+            padding: 3,
+            transition: "all 0.25s ease",
+          }}
+        >
+          <span
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: "50%",
+              background: dark ? "#fff" : "#000",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transform: dark ? "translateX(0)" : "translateX(30px)",
+              transition: "transform 0.25s ease",
+              color: dark ? "#000" : "#fff",
+            }}
+          >
+            {dark ? <Moon size={14} /> : <Sun size={14} />}
+          </span>
+        </button>
 
       {/* ── Page content ─────────────────────────────────────────── */}
       <div style={{
@@ -268,11 +265,25 @@ export default function PersonalWebsite() {
 
       </div>
 
-      <style>{`
+       <style>{`
         * { box-sizing: border-box; }
-        body { margin: 0; }
+
+        html, body, #root {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          min-width: 100%;
+          min-height: 100%;
+          background: #000 !important;
+        }
+
+        body {
+          min-height: 100dvh;
+          overflow-x: hidden;
+        }
+
         a { cursor: pointer; }
-      `}</style>
+`}</style>
     </div>
   );
 }
