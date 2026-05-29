@@ -1,7 +1,25 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun, MapPin } from "lucide-react";
+import { HashRouter, Routes, Route, Link } from "react-router-dom";
+// PersonalWebsite component defined below in this file
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+ 
 
-/* ============================================================
+export default function App() {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/"           element={<PersonalWebsite />} />
+        <Route path="/blog"       element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+      </Routes>
+    </HashRouter>
+  );
+}
+ 
+
+/* ============/>==========================================
    👤 EDIT YOUR PROFILE HERE — change only this section
    ============================================================ */
 const PROFILE = {
@@ -16,24 +34,28 @@ const PROFILE = {
   // Each string = one paragraph. Add or remove as needed.
   bio: [
     <>
-      Hi, I'm a 19 yr old techbreaker, engineer, anime/movie lover, curious, 
-      deeply interested in defensive security and digital investigations.      
+      Hi, i'm ram, a 19 yr old building or breaking something for fun.          
     </>,
     <>
       When you're reading this, I might be doing one of these : hacking my college website, learning to code,
-      reading books, exploring new technologies or just sleeping.
+      reading books, watching anime, exploring new technologies or probably just sleeping.
             
     </>,
     <>
-      My projects are available on{" "}
-      <BoldLink href="https://github.com/RamaChandra53/">GitHub</BoldLink>
+    I like to research what's underneath the hood of tech, how systems work, layers beneath them, integrations between them, 
+    the level of abstraction those people build and make it simple to understand, view and use,   W for them.
+    </>,
+
+    // <>
+    //   My projects are available on{" "}
+    //   <BoldLink href="https://github.com/RamaChandra53/">GitHub</BoldLink>
     
-    </>,
-    <>
-      Feel free to reach me at{" "}
-      {/* ← change the email below */}
-      <BoldLink href="mailto:vramachandra@proton.me">vramachandra@proton.me</BoldLink>.
-    </>,
+    // </>,
+    // <>
+    //   Feel free to reach me at{" "}
+    //   {/* ← change the email below */}
+    //   <BoldLink href="mailto:vramachandra@proton.me">vramachandra@proton.me</BoldLink>.
+    // </>,
    
   ],
 
@@ -75,9 +97,10 @@ function BoldLink({ href, children }) {
   );
 }
 
-export default function PersonalWebsite() {
-  const [dark, setDark] = useState(true);
+function PersonalWebsite() {
+  const [dark, setDark] = useState(() => localStorage.getItem("theme") !== "light");
   const [time, setTime]  = useState("");
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
 
   // ── Live clock ──────────────────────────────────────────────
   useEffect(() => {
@@ -96,28 +119,102 @@ export default function PersonalWebsite() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Load Google Fonts ────────────────────────────────────────
   useEffect(() => {
-    if (document.getElementById("gf")) return;
-    const l = document.createElement("link");
-    l.id = "gf";
-    l.rel = "stylesheet";
-    l.href =
-      "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Inter:wght@400;500;700&display=swap";
-    document.head.appendChild(l);
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+  
+  
+
+
+
+// Typing effect component: types words, appends a full stop, waits, then backspaces
+function TypingEffect({ words = ["tech nerd", "engineer", "anime lover"], pause = 2000, style = {} }) {
+  const [display, setDisplay] = useState("");
+  const [cursorVisible, setCursorVisible] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const indexRef = { current: 0 };
+    const charRef = { current: 0 };
+    const modeRef = { current: 'typing' }; // 'typing' | 'pause' | 'deleting'
+    let timeout = null;
+
+    function tick() {
+      const word = words[indexRef.current];
+      if (!mounted) return;
+
+      if (modeRef.current === 'typing') {
+        if (charRef.current <= word.length) {
+          // show characters; add full stop when at end
+          const text = word.slice(0, charRef.current) + (charRef.current === word.length ? '.' : '');
+          setDisplay(text);
+          charRef.current += 1;
+          timeout = setTimeout(tick, 80);
+        } else {
+          modeRef.current = 'pause';
+          timeout = setTimeout(() => {
+            modeRef.current = 'deleting';
+            tick();
+          }, pause);
+        }
+      } else if (modeRef.current === 'deleting') {
+        if (charRef.current >= 0) {
+          // delete characters one by one (this will delete the dot first)
+          const text = word.slice(0, charRef.current);
+          setDisplay(text);
+          charRef.current -= 1;
+          timeout = setTimeout(tick, 50);
+        } else {
+          // move to next word
+          indexRef.current = (indexRef.current + 1) % words.length;
+          charRef.current = 0;
+          modeRef.current = 'typing';
+          timeout = setTimeout(tick, 200);
+        }
+      }
+    }
+
+    // start
+    tick();
+
+    // cursor blink
+    const blink = setInterval(() => setCursorVisible(v => !v), 500);
+
+    return () => {
+      mounted = false;
+      clearInterval(blink);
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [words, pause]);
+
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, lineHeight: '1.2', minHeight: '1.2em', verticalAlign: 'middle', overflow: 'visible', ...style }}>
+      <span style={{ fontFamily: 'inherit', fontSize: 'inherit', lineHeight: '1.2' }}>{display}</span>
+      <span style={{ width: 1, height: '1em', background: cursorVisible ? 'currentColor' : 'transparent', display: 'inline-block', marginLeft: 1, verticalAlign: 'baseline' }} />
+    </div>
+  );
+}
+
+  useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
+    document.body.style.backgroundColor = dark ? "#000000" : "#ffffff";
+  }, [dark]);
 
   // ── Color themes ─────────────────────────────────────────────
   const bg = dark ? "#000000" : "#ffffff";
   const textMain  = dark ? "rgba(241,237,230,0.92)"  : "#1c1a17";
   const textMuted = dark ? "rgba(180,175,165,0.65)"  : "#6b6560";
-  const blobLeft  = dark ? "rgba(59,130,246,0.28)"   : "rgba(59,130,246,0.12)";
-  const blobRight = dark ? "rgba(99,102,241,0.28)"   : "rgba(99,102,241,0.12)";
+  const nameFontSize = viewportWidth <= 640
+    ? "clamp(28px, 11vw, 52px)"
+    : "clamp(20px, 4.5vw, 40px)";
+  
 
   return (
     <div style={{
       minHeight: "100dvh",
-      width: "100vw",
+      width: "100%",
       background: bg, 
       color: textMain,
       fontFamily: "'Inter', sans-serif",
@@ -129,14 +226,14 @@ export default function PersonalWebsite() {
     }}>
 
     
-      {/* ── Theme toggle (top-right) ─────────────────────────────── */}
+      {/* ── Theme toggle (bottom-right) ───────────────────────────── */}
               <button
           aria-label="Toggle theme"
           onClick={() => setDark(d => !d)}
           style={{
-            position: "fixed",
-            top: 24,
-            right: 28,
+        position: "fixed",
+        bottom: 24,
+        right: 28,
             zIndex: 20,
             width: 64,
             height: 32,
@@ -169,55 +266,36 @@ export default function PersonalWebsite() {
       {/* ── Page content ─────────────────────────────────────────── */}
       <div style={{
         position: "relative", zIndex: 1,
-        maxWidth: 560, margin: "0 auto",
-        padding: "60px 24px 80px",
+        maxWidth: 640, margin: "0 auto",
+        padding: "220px 24px 80px",
         display: "flex", flexDirection: "column",
         alignItems: "center", minHeight: "100vh",
       }}>
 
-        {/* ── Avatar ───────────────────────────────────────────────
-            • Put your photo at /public/avatar.jpg in your project
-            • If the image is missing it shows your first initial   */}
-        <div style={{
-          width: 88, height: 88, borderRadius: "50%",
-          overflow: "hidden",
-          border: `2px solid ${dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)"}`,
-          marginBottom: 28,
-          boxShadow: dark ? "0 0 0 4px rgba(59,130,246,0.12)" : "none",
-          flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <img
-            src={PROFILE.avatar}
-            alt={PROFILE.name}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            onError={e => {
-              e.target.style.display = "none";
-              e.target.parentNode.style.background = "linear-gradient(135deg,#3b82f6,#6366f1)";
-              e.target.parentNode.style.fontFamily = "Cormorant Garamond, serif";
-              e.target.parentNode.style.fontSize = "36px";
-              e.target.parentNode.style.fontStyle = "italic";
-              e.target.parentNode.style.color = "#fff";
-              e.target.parentNode.innerHTML = PROFILE.name[0];
-            }}
-          />
-        </div>
+        {/* Avatar removed as requested */}
 
         {/* ── Name ─────────────────────────────────────────────────
             Big italic serif — the main visual statement of the page */}
         <h1 style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontStyle: "italic",
+          fontFamily: "'Silkscreen', 'Lora', serif",
+          fontStyle: "normal",
           fontWeight: 600,
-          fontSize: "clamp(48px, 8vw, 72px)",
-          lineHeight: 1.05,
-          textAlign: "center",
+          fontSize: nameFontSize,
+          lineHeight: 1.2,
+          textAlign: "left",
+          alignSelf: "flex-start",
           letterSpacing: "-0.01em",
           margin: "0 0 12px",
           color: dark ? "#f1ede6" : "#1c1a17",
+          whiteSpace: "normal",
         }}>
           {PROFILE.name}
         </h1>
+
+        {/* typing keywords effect: appears directly after the profile name */}
+        <div style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+          <TypingEffect words={["tech nerd", "engineer", "anime lover"]} pause={2000} style={{ color: textMain, fontSize: 16 }} />
+        </div>
 
         {/* ── Tagline ──────────────────────────────────────────────── */}
         <p style={{
@@ -237,13 +315,13 @@ export default function PersonalWebsite() {
           ))}
         </div>
 
-        <div style={{ flex: 1, minHeight: 48 }} />
+        <div style={{ flex: 1, minHeight: 12 }} />
 
         {/* ── Nav links ────────────────────────────────────────────── */}
         <nav style={{
           display: "flex", flexWrap: "wrap",
           justifyContent: "center", gap: "8px 32px",
-          marginTop: 48, marginBottom: 28,
+          marginTop: 24, marginBottom: 28,
         }}>
           {PROFILE.links.map(link => (
             <NavLink key={link.label} href={link.href} muted={textMuted} main={textMain}>
@@ -264,47 +342,37 @@ export default function PersonalWebsite() {
         </div>
 
       </div>
-
-       <style>{`
-        * { box-sizing: border-box; }
-
-        html, body, #root {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          min-width: 100%;
-          min-height: 100%;
-          background: #000 !important;
-        }
-
-        body {
-          min-height: 100dvh;
-          overflow-x: hidden;
-        }
-
-        a { cursor: pointer; }
-`}</style>
     </div>
   );
 }
 
+
+
 // Plain text nav link with hover lift
 function NavLink({ href, children, muted, main }) {
   const [hov, setHov] = useState(false);
+  const isExternal = /^(https?:\/\/|mailto:)/.test(href);
+  const commonStyle = {
+    textDecoration: "none", fontSize: 17, fontWeight: 700,
+    color: hov ? main : muted,
+    display: "inline-block",
+    transform: hov ? "translateY(-1px)" : "translateY(0)",
+    transition: "color 0.2s, transform 0.2s",
+  };
+  const hoverProps = {
+    onMouseEnter: () => setHov(true),
+    onMouseLeave: () => setHov(false),
+    style: commonStyle,
+  };
   return (
-    <a
-      href={href}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        textDecoration: "none", fontSize: 17, fontWeight: 700,
-        color: hov ? main : muted,
-        display: "inline-block",
-        transform: hov ? "translateY(-1px)" : "translateY(0)",
-        transition: "color 0.2s, transform 0.2s",
-      }}
-    >
-      {children}
-    </a>
+    isExternal ? (
+      <a href={href} {...hoverProps}>
+        {children}
+      </a>
+    ) : (
+      <Link to={href} {...hoverProps}>
+        {children}
+      </Link>
+    )
   );
 }
